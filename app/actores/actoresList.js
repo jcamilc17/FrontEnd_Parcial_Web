@@ -3,12 +3,6 @@
 import {useEffect, useState} from "react";
 import Link from "next/link";
 
-import Card from "react-bootstrap/Card";
-import Row from "react-bootstrap/Row";
-import Col from "react-bootstrap/Col";
-import Button from "react-bootstrap/Button";
-import Badge from "react-bootstrap/Badge";
-
 function ListaActores() {
   const [actorList, setActorList] = useState([]);
 
@@ -46,102 +40,96 @@ function ListaActores() {
   };
 
   return (
-    <div className="container py-5">
+    <div className="mx-auto max-w-6xl px-4 py-12">
       {/* Encabezado: Muestra el título de la sección, el contador de actores y el botón de navegación para crear uno nuevo */}
-      <div className="d-flex justify-content-between align-items-center mb-4">
+      <div className="mb-6 flex items-center justify-between">
         <div>
-          <h2 className="fw-bold mb-1">Actores</h2>
-          <p className="text-muted mb-0">{actorList.length} actores registrados</p>
+          <h2 className="mb-1 text-3xl font-bold">Actores</h2>
+          <p className="text-gray-500">{actorList.length} actores registrados</p>
         </div>
-        <Link href="/crear-actor" className="btn btn-primary">
+        <Link
+          href="/crear-actor"
+          className="rounded-md bg-blue-600 px-4 py-2 text-white transition-colors hover:bg-blue-700"
+        >
           + Crear actor
         </Link>
       </div>
 
       {/* Estado vacío: Se muestra únicamente si la lista de actores se encuentra vacía */}
       {actorList.length === 0 && (
-        <div className="text-center text-muted py-5 border rounded-3 bg-light">
-          <p className="mb-0">No hay actores para mostrar.</p>
+        <div className="rounded-xl border border-gray-200 bg-gray-50 py-12 text-center text-gray-500">
+          <p>No hay actores para mostrar.</p>
         </div>
       )}
 
       {/* Cuadrícula responsiva que mapea y renderiza una tarjeta por cada actor en la lista */}
-      <Row xs={1} sm={2} lg={3} className="g-4">
+      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {actorList.map((actor) => (
-          <Col key={actor.id}>
-            <Card className="h-100 border-0 shadow-sm overflow-hidden">
-              {/* Contenedor de la foto del actor con la etiqueta de nacionalidad posicionada de forma absoluta encima */}
-              <div className="position-relative">
-                <Card.Img
-                  variant="top"
-                  src={actor.photo}
-                  alt={actor.name}
-                  style={{ height: "320px", objectFit: "cover" }}
-                />
-                <Badge bg="dark" className="position-absolute top-0 end-0 m-3 px-3 py-2 opacity-75">
-                  {actor.nationality}
-                </Badge>
-              </div>
+          <div key={actor.id} className="flex h-full flex-col overflow-hidden rounded-lg bg-white shadow-sm">
+            {/* Contenedor de la foto del actor con la etiqueta de nacionalidad posicionada de forma absoluta encima */}
+            <div className="relative">
+              <img
+                src={actor.photo}
+                alt={actor.name}
+                className="h-80 w-full object-cover"
+              />
+              <span className="absolute top-0 right-0 m-4 rounded-md bg-gray-900 px-3 py-2 text-xs font-bold text-white opacity-75">
+                {actor.nationality}
+              </span>
+            </div>
 
-              {/* Cuerpo de la tarjeta: Contiene información principal, biografía y películas asociadas */}
-              <Card.Body className="d-flex flex-column">
-                <Card.Title className="fw-bold fs-5 mb-1">{actor.name}</Card.Title>
-                <Card.Subtitle className="text-muted small mb-3">
-                  Nacido el{" "}
-                  {new Date(actor.birthDate).toLocaleDateString("es-CO", {
-                    day: "numeric",
-                    month: "long",
-                    year: "numeric",
-                    timeZone: "UTC",
-                  })}
-                </Card.Subtitle>
+            {/* Cuerpo de la tarjeta: Contiene información principal, biografía y películas asociadas */}
+            <div className="flex flex-1 flex-col p-4">
+              <h5 className="mb-1 text-xl font-bold">{actor.name}</h5>
+              <h6 className="mb-4 text-sm text-gray-500">
+                Nacido el{" "}
+                {new Date(actor.birthDate).toLocaleDateString("es-CO", {
+                  day: "numeric",
+                  month: "long",
+                  year: "numeric",
+                  timeZone: "UTC",
+                })}
+              </h6>
 
-                {/* Biografía recortada visualmente a un máximo de 3 líneas mediante estilos CSS */}
-                <Card.Text
-                  className="text-secondary small"
-                  style={{
-                    display: "-webkit-box",
-                    WebkitLineClamp: 3,
-                    WebkitBoxOrient: "vertical",
-                    overflow: "hidden",
-                  }}
-                >
-                  {actor.biography}
-                </Card.Text>
+              {/* Biografía recortada visualmente a un máximo de 3 líneas mediante estilos CSS */}
+              <p className="mb-4 line-clamp-3 text-sm text-gray-600">
+                {actor.biography}
+              </p>
 
-                {/* Lista de películas del actor renderizadas como etiquetas/badges de forma dinámica */}
-                {Array.isArray(actor.movies) && actor.movies.length > 0 && (
-                  <div className="d-flex flex-wrap gap-1 mt-auto">
-                    {actor.movies.map((m, i) => (
-                      <Badge key={m.id ?? i} bg="light" text="dark" className="border fw-normal">
-                        {m.title ?? m}
-                      </Badge>
-                    ))}
-                  </div>
-                )}
-              </Card.Body>
+              {/* Lista de películas del actor renderizadas como etiquetas/badges de forma dinámica */}
+              {Array.isArray(actor.movies) && actor.movies.length > 0 && (
+                <div className="mt-auto flex flex-wrap gap-1">
+                  {actor.movies.map((m, i) => (
+                    <span
+                      key={m.id ?? i}
+                      className="rounded-md border border-gray-200 bg-gray-50 px-2 py-1 text-xs text-gray-900"
+                    >
+                      {m.title ?? m}
+                    </span>
+                  ))}
+                </div>
+              )}
+            </div>
 
-              {/* Pie de la tarjeta: Botones de acción para modificar o eliminar al actor respectivo */}
-              <Card.Footer className="bg-white border-0 d-flex gap-2 pb-3">
-                <Link
-                  href={`/actores/${actor.id}/editar`}
-                  className="btn btn-outline-primary btn-sm flex-fill"
-                >
-                  Editar
-                </Link>
-                <Button
-                  variant="outline-danger"
-                  size="sm"
-                  className="flex-fill"
-                  onClick={() => handleDelete(actor.id)}
-                >
-                  Eliminar
-                </Button>
-              </Card.Footer>
-            </Card>
-          </Col>
+            {/* Pie de la tarjeta: Botones de acción para modificar o eliminar al actor respectivo */}
+            <div className="flex gap-2 bg-white px-4 pb-4">
+              <Link
+                href={`/actores/${actor.id}/editar`}
+                className="flex-1 rounded-md border border-blue-600 px-2 py-1 text-center text-sm text-blue-600 transition-colors hover:bg-blue-600 hover:text-white"
+              >
+                Editar
+              </Link>
+              <button
+                type="button"
+                className="flex-1 cursor-pointer rounded-md border border-red-600 px-2 py-1 text-sm text-red-600 transition-colors hover:bg-red-600 hover:text-white"
+                onClick={() => handleDelete(actor.id)}
+              >
+                Eliminar
+              </button>
+            </div>
+          </div>
         ))}
-      </Row>
+      </div>
     </div>
   );
 }

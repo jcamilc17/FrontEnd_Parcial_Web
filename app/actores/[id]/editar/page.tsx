@@ -4,8 +4,8 @@ export default async function EditarActorPage({ params }: PageProps<"/actores/[i
   const { id } = await params;
 
   return (
-    <main className="container my-4" style={{ maxWidth: "600px" }}>
-      <h1 className="mb-4">Editar Actor</h1>
+    <main className="mx-auto my-6 max-w-[600px] px-4">
+      <h1 className="mb-6 text-4xl font-medium">Editar Actor</h1>
       <FormularioActor actorId={id} />
     </main>
   );

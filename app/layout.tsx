@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import "bootstrap/dist/css/bootstrap.min.css";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -13,15 +12,15 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     // Define el idioma principal del documento HTML como español
     <html lang="es">
       <body>
-        {/* Barra de navegación superior fija con fondo oscuro utilizando Bootstrap */}
-        <nav className="navbar navbar-expand bg-dark" data-bs-theme="dark">
-          <div className="container">
+        {/* Barra de navegación superior fija con fondo oscuro utilizando Tailwind */}
+        <nav className="bg-gray-900 py-2">
+          <div className="mx-auto flex max-w-6xl items-center gap-4 px-4">
             {/* Enlace principal que redirige al inicio de la aplicación */}
-            <Link href="/" className="navbar-brand fw-bold">Parcial Web</Link>
+            <Link href="/" className="py-1 text-xl font-bold text-white">Parcial Web</Link>
             {/* Enlaces de navegación secundarios para moverse rápidamente entre secciones */}
-            <div className="navbar-nav">
-              <Link href="/actores" className="nav-link">Actores</Link>
-              <Link href="/crear-actor" className="nav-link">Crear Actor</Link>
+            <div className="flex gap-4">
+              <Link href="/actores" className="py-2 text-white/60 transition-colors hover:text-white">Actores</Link>
+              <Link href="/crear-actor" className="py-2 text-white/60 transition-colors hover:text-white">Crear Actor</Link>
             </div>
           </div>
         </nav>

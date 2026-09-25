@@ -3,49 +3,37 @@ import Link from 'next/link';
 export default function Home() {
   // PARTE 3: Pagina de configuración de rutas y enlaces de navegación
   return (
-    <main className="container py-5">
+    <main className="mx-auto max-w-6xl px-4 py-12">
       {/* Encabezado de bienvenida: Título principal y descripción de la sección de gestión */}
-      <div className="text-center mb-5">
-        <h1 className="display-5 fw-bold mb-3">Gestión de Actores</h1>
-        <p className="lead text-muted mx-auto" style={{ maxWidth: "600px" }}>
+      <div className="mb-12 text-center">
+        <h1 className="mb-4 text-5xl font-bold">Gestión de Actores</h1>
+        <p className="mx-auto max-w-[600px] text-xl text-gray-500">
           Consulta, crea, edita y elimina actores desde un solo lugar.
         </p>
       </div>
 
       {/* Menú de navegación principal con tarjetas interactivas organizadas en cuadrícula */}
-      <nav className="row g-4 justify-content-center">
+      <nav className="grid grid-cols-1 gap-6 md:grid-cols-3">
         {/* Tarjeta de acceso a la página de inicio */}
-        <div className="col-12 col-md-4">
-          <Link href="/" className="card h-100 border-0 shadow-sm text-decoration-none card-hover">
-            <div className="card-body text-center p-4">
-              <div className="fs-1 mb-2">🏠</div>
-              <h5 className="fw-bold text-dark">Inicio</h5>
-              <p className="text-muted small mb-0">Vuelve a la página principal.</p>
-            </div>
-          </Link>
-        </div>
+        <Link href="/" className="card-hover block h-full rounded-lg bg-white p-6 text-center shadow-sm">
+          <div className="mb-2 text-4xl">🏠</div>
+          <h5 className="mb-2 text-xl font-bold text-gray-900">Inicio</h5>
+          <p className="text-sm text-gray-500">Vuelve a la página principal.</p>
+        </Link>
 
         {/* Tarjeta de acceso a la lista completa de actores */}
-        <div className="col-12 col-md-4">
-          <Link href="/actores" className="card h-100 border-0 shadow-sm text-decoration-none card-hover">
-            <div className="card-body text-center p-4">
-              <div className="fs-1 mb-2">🎬</div>
-              <h5 className="fw-bold text-dark">Actores</h5>
-              <p className="text-muted small mb-0">Explora la lista completa de actores.</p>
-            </div>
-          </Link>
-        </div>
+        <Link href="/actores" className="card-hover block h-full rounded-lg bg-white p-6 text-center shadow-sm">
+          <div className="mb-2 text-4xl">🎬</div>
+          <h5 className="mb-2 text-xl font-bold text-gray-900">Actores</h5>
+          <p className="text-sm text-gray-500">Explora la lista completa de actores.</p>
+        </Link>
 
         {/* Tarjeta de acceso rápido al formulario para registrar un nuevo actor */}
-        <div className="col-12 col-md-4">
-          <Link href="/crear-actor" className="card h-100 border-0 shadow-sm text-decoration-none card-hover">
-            <div className="card-body text-center p-4">
-              <div className="fs-1 mb-2">➕</div>
-              <h5 className="fw-bold text-dark">Crear Actor</h5>
-              <p className="text-muted small mb-0">Agrega un nuevo actor con el formulario.</p>
-            </div>
-          </Link>
-        </div>
+        <Link href="/crear-actor" className="card-hover block h-full rounded-lg bg-white p-6 text-center shadow-sm">
+          <div className="mb-2 text-4xl">➕</div>
+          <h5 className="mb-2 text-xl font-bold text-gray-900">Crear Actor</h5>
+          <p className="text-sm text-gray-500">Agrega un nuevo actor con el formulario.</p>
+        </Link>
       </nav>
     </main>
   );

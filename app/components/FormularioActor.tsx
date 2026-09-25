@@ -2,13 +2,7 @@
 
 import { useState, useEffect, FormEvent, ChangeEvent } from "react";
 import { useRouter } from "next/navigation";
-import Form from "react-bootstrap/Form";
-import Button from "react-bootstrap/Button";
-import Alert from "react-bootstrap/Alert";
 import Link from "next/link";
-import Card from "react-bootstrap/Card";
-import Row from "react-bootstrap/Row";
-import Col from "react-bootstrap/Col";
 
 const API_URL = "http://localhost:3000/api/v1/actors";
 
@@ -88,70 +82,84 @@ function FormularioActor({ actorId }: Props) {
     }
   };
 
-    return (
-    <Card className="border-0 shadow-sm">
+  // Clases compartidas por todos los inputs del formulario
+  const inputClass =
+    "w-full rounded-md border border-gray-300 bg-white px-3 py-2 focus:border-blue-400 focus:ring-4 focus:ring-blue-200 focus:outline-none";
+
+  return (
+    <div className="overflow-hidden rounded-lg bg-white shadow-sm">
       {/* Vista previa de la foto (se renderiza de manera condicional únicamente cuando hay una URL cargada) */}
       {photo && (
-        <div className="bg-light text-center p-3 border-bottom">
+        <div className="border-b border-gray-200 bg-gray-50 p-4 text-center">
           <img
             src={photo}
             alt="Vista previa"
-            className="rounded-3 shadow-sm"
-            style={{ height: "160px", width: "160px", objectFit: "cover" }}
+            className="mx-auto h-40 w-40 rounded-xl object-cover shadow-sm"
           />
         </div>
       )}
 
-      <Card.Body className="p-4">
+      <div className="p-6">
         {/* Formulario principal vinculado a la función handleSubmit */}
-        <Form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit}>
           {/* Muestra una alerta de error en caso de que ocurra un problema al guardar o cargar */}
-          {error && <Alert variant="danger">{error}</Alert>}
+          {error && (
+            <div role="alert" className="mb-4 rounded-md border border-red-200 bg-red-50 px-4 py-3 text-red-800">
+              {error}
+            </div>
+          )}
 
           {/* Cuadrícula que mapea dinámicamente los campos del formulario */}
-          <Row className="g-3">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             {campos.map(({ id, label, type, value, setValue }) => (
-              <Col md={id === "nationality" || id === "birthDate" ? 6 : 12} key={id}>
-                <Form.Group controlId={id}>
-                  <Form.Label className="fw-semibold small text-uppercase text-muted">
-                    {label}
-                  </Form.Label>
-                  {type === "textarea" ? (
-                    <Form.Control
-                      as="textarea"
-                      rows={4}
-                      value={value}
-                      onChange={(e: ChangeEvent<HTMLTextAreaElement>) => setValue(e.target.value)}
-                      placeholder="Cuéntanos sobre el actor..."
-                      required
-                    />
-                  ) : (
-                    <Form.Control
-                      type={type}
-                      value={value}
-                      onChange={(e: ChangeEvent<HTMLInputElement>) => setValue(e.target.value)}
-                      placeholder={type === "url" ? "https://..." : ""}
-                      required
-                    />
-                  )}
-                </Form.Group>
-              </Col>
+              <div className={id === "nationality" || id === "birthDate" ? "" : "md:col-span-2"} key={id}>
+                <label htmlFor={id} className="mb-2 block text-sm font-semibold text-gray-500 uppercase">
+                  {label}
+                </label>
+                {type === "textarea" ? (
+                  <textarea
+                    id={id}
+                    rows={4}
+                    value={value}
+                    onChange={(e: ChangeEvent<HTMLTextAreaElement>) => setValue(e.target.value)}
+                    placeholder="Cuéntanos sobre el actor..."
+                    className={inputClass}
+                    required
+                  />
+                ) : (
+                  <input
+                    id={id}
+                    type={type}
+                    value={value}
+                    onChange={(e: ChangeEvent<HTMLInputElement>) => setValue(e.target.value)}
+                    placeholder={type === "url" ? "https://..." : ""}
+                    className={inputClass}
+                    required
+                  />
+                )}
+              </div>
             ))}
-          </Row>
+          </div>
 
           {/* Barra inferior de botones de acción: cancelar o enviar el formulario */}
-          <div className="d-flex justify-content-end gap-2 mt-4 pt-3 border-top">
-            <Link href="/actores" className="btn btn-outline-secondary">
+          <div className="mt-6 flex justify-end gap-2 border-t border-gray-200 pt-4">
+            <Link
+              href="/actores"
+              className="rounded-md border border-gray-500 px-4 py-2 text-gray-600 transition-colors hover:bg-gray-500 hover:text-white"
+            >
               Cancelar
             </Link>
-            <Button variant="primary" type="submit" className="px-4">
+            <button
+              type="submit"
+              className="cursor-pointer rounded-md bg-blue-600 px-6 py-2 text-white transition-colors hover:bg-blue-700"
+            >
               {/* El texto del botón cambia dinámicamente según si estamos editando o creando un nuevo registro */}
               {esEdicion ? "Guardar cambios" : "Crear actor"}
-            </Button>
+            </button>
           </div>
-        </Form>
-      </Card.Body>
-    </Card>
+        </form>
+      </div>
+    </div>
   );
 }
 

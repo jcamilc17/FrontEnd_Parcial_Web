@@ -1,3 +1,5 @@
+@import "tailwindcss";
+
 body {
   /* Fondo con un sutil degradado moderno en lugar de un color plano */
   background: linear-gradient(135deg, #f8f9fa 0%, #a0c8f0 100%);

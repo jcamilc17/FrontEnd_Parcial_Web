@@ -12,6 +12,7 @@ type Props = {
   actorId?: string; // si viene, el formulario está en modo edición
 };
 
+// PARTE 2: Función componente Formulario crear y editar actores
 function FormularioActor({ actorId }: Props) {
   const router = useRouter();
   const esEdicion = Boolean(actorId);
@@ -24,25 +25,29 @@ function FormularioActor({ actorId }: Props) {
   const [biography, setBiography] = useState("");
   const [error, setError] = useState("");
 
-  // En modo edición, cargar los datos del actor al montar el componente
+  // PARTE 5: Función useEffect para cargar los datos del actor si estamos en modo edición
   useEffect(() => {
+    // Si no existe un ID de actor (modo creación), detiene la ejecución del efecto
     if (!actorId) return;
 
+    // Realiza una petición GET para obtener los datos específicos del actor por su ID
     fetch(`${API_URL}/${actorId}`)
       .then((res) => {
+        // Valida si la respuesta fue correcta; si no, lanza un error con el código de estado
         if (!res.ok) throw new Error(`Error ${res.status}`);
         return res.json();
       })
       .then((actor) => {
+        // Rellena los estados del formulario con la información obtenida del servidor
         setName(actor.name ?? "");
         setPhoto(actor.photo ?? "");
         setNationality(actor.nationality ?? "");
-        // el input de fecha necesita el formato YYYY-MM-DD
+        // El input de fecha necesita el formato YYYY-MM-DD; se recorta la cadena para ajustarlo
         setBirthDate((actor.birthDate ?? "").slice(0, 10));
         setBiography(actor.biography ?? "");
       })
       .catch(() => setError("No se pudo cargar el actor."));
-  }, [actorId]);
+  }, [actorId]); // Se ejecuta cada vez que el ID del actor cambie
 
   // Configuración de los campos, cada uno con su valor y su setter
   const campos = [
@@ -53,21 +58,28 @@ function FormularioActor({ actorId }: Props) {
     { id: "biography", label: "Biografía", type: "textarea", value: biography, setValue: setBiography },
   ];
 
+  // PARTE 4: Función que conecta formulario con la API para reflejar los cambios en lista de actores
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    // Evita el comportamiento por defecto de recarga de la página al enviar el formulario
     e.preventDefault();
 
     try {
-      // Crear: POST a /actors. Editar: PUT a /actors/:id
+      // Determina la URL y el método HTTP según si se trata de una edición (PUT) o de una creación (POST)
       const response = await fetch(esEdicion ? `${API_URL}/${actorId}` : API_URL, {
         method: esEdicion ? "PUT" : "POST",
+        // Especifica que el cuerpo de la petición se enviará en formato JSON
         headers: { "Content-Type": "application/json" },
+        // Convierte los datos del formulario a una cadena JSON para enviarlos en el cuerpo
         body: JSON.stringify({ name, photo, nationality, birthDate, biography }),
       });
 
+      // Valida si la respuesta del servidor fue exitosa; de lo contrario, lanza un error con el código recibido
       if (!response.ok) throw new Error(`Error ${response.status}`);
 
+      // Redirige al usuario a la vista principal de la lista de actores tras guardar con éxito
       router.push("/actores");
     } catch (err) {
+      // Captura cualquier error de red o de servidor y actualiza el estado de error para notificar al usuario
       setError("No se pudo guardar el actor. Revisa los datos e intenta de nuevo.");
     }
   };

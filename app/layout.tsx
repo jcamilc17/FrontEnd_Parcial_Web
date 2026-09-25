@@ -20,7 +20,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             {/* Enlaces de navegación secundarios para moverse rápidamente entre secciones */}
             <div className="flex gap-4">
               <Link href="/actores" className="py-2 text-white/60 transition-colors hover:text-white">Actores</Link>
+              <Link href="/movies" className="py-2 text-white/60 transition-colors hover:text-white">Películas</Link>
               <Link href="/crear-actor" className="py-2 text-white/60 transition-colors hover:text-white">Crear Actor</Link>
+              <Link href="/crear-pelicula" className="py-2 text-white/60 transition-colors hover:text-white">Crear Película</Link>
+              <Link href="/crear-pelicula" className="py-2 text-white/60 transition-colors hover:text-white">Crear Película</Link>
             </div>
           </div>
         </nav>

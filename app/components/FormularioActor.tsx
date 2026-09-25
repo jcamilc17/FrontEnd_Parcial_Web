@@ -6,6 +6,86 @@ import Link from "next/link";
 
 const API_URL = "http://localhost:3000/api/v1/actors";
 
+// Datos que componen un actor (coinciden con el ActorDto del back)
+export type DatosActor = {
+  name: string;
+  photo: string;
+  nationality: string;
+  birthDate: string;
+  biography: string;
+};
+
+// Valores iniciales de un actor vacío (modo creación)
+export const actorVacio: DatosActor = {
+  name: "",
+  photo: "",
+  nationality: "",
+  birthDate: "",
+  biography: "",
+};
+
+// Clases compartidas por todos los inputs del formulario
+export const inputClass =
+  "w-full rounded-md border border-gray-300 bg-white px-3 py-2 focus:border-blue-400 focus:ring-4 focus:ring-blue-200 focus:outline-none";
+
+// Clases compartidas por todas las etiquetas de los campos
+export const labelClass = "mb-2 block text-sm font-semibold text-gray-500 uppercase";
+
+type CamposActorProps = {
+  actor: DatosActor;
+  setActor: (actor: DatosActor) => void;
+  prefijo?: string; // prefijo para los ids de los inputs, evita ids repetidos si hay varios formularios en la página
+};
+
+// Subcomponente reutilizable con los campos del actor; lo usan FormularioActor y FormularioPelicula
+export function CamposActor({ actor, setActor, prefijo = "" }: CamposActorProps) {
+  // Configuración de los campos, cada uno con su clave dentro del objeto actor
+  const campos: { id: keyof DatosActor; label: string; type: string }[] = [
+    { id: "name", label: "Nombre", type: "text" },
+    { id: "photo", label: "Foto (URL)", type: "url" },
+    { id: "nationality", label: "Nacionalidad", type: "text" },
+    { id: "birthDate", label: "Fecha de nacimiento", type: "date" },
+    { id: "biography", label: "Biografía", type: "textarea" },
+  ];
+
+  // Actualiza únicamente el campo modificado conservando el resto de valores del actor
+  const actualizar = (campo: keyof DatosActor, valor: string) => setActor({ ...actor, [campo]: valor });
+
+  return (
+    // Cuadrícula que mapea dinámicamente los campos del formulario
+    <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+      {campos.map(({ id, label, type }) => (
+        <div className={id === "nationality" || id === "birthDate" ? "" : "md:col-span-2"} key={id}>
+          <label htmlFor={prefijo + id} className={labelClass}>
+            {label}
+          </label>
+          {type === "textarea" ? (
+            <textarea
+              id={prefijo + id}
+              rows={4}
+              value={actor[id]}
+              onChange={(e: ChangeEvent<HTMLTextAreaElement>) => actualizar(id, e.target.value)}
+              placeholder="Cuéntanos sobre el actor..."
+              className={inputClass}
+              required
+            />
+          ) : (
+            <input
+              id={prefijo + id}
+              type={type}
+              value={actor[id]}
+              onChange={(e: ChangeEvent<HTMLInputElement>) => actualizar(id, e.target.value)}
+              placeholder={type === "url" ? "https://..." : ""}
+              className={inputClass}
+              required
+            />
+          )}
+        </div>
+      ))}
+    </div>
+  );
+}
+
 type Props = {
   actorId?: string; // si viene, el formulario está en modo edición
 };
@@ -15,12 +95,8 @@ function FormularioActor({ actorId }: Props) {
   const router = useRouter();
   const esEdicion = Boolean(actorId);
 
-  // Un useState por cada campo del formulario
-  const [name, setName] = useState("");
-  const [photo, setPhoto] = useState("");
-  const [nationality, setNationality] = useState("");
-  const [birthDate, setBirthDate] = useState("");
-  const [biography, setBiography] = useState("");
+  // Un único estado con todos los campos del formulario del actor
+  const [actor, setActor] = useState<DatosActor>(actorVacio);
   const [error, setError] = useState("");
 
   // PARTE 5: Función useEffect para cargar los datos del actor si estamos en modo edición
@@ -35,26 +111,19 @@ function FormularioActor({ actorId }: Props) {
         if (!res.ok) throw new Error(`Error ${res.status}`);
         return res.json();
       })
-      .then((actor) => {
-        // Rellena los estados del formulario con la información obtenida del servidor
-        setName(actor.name ?? "");
-        setPhoto(actor.photo ?? "");
-        setNationality(actor.nationality ?? "");
-        // El input de fecha necesita el formato YYYY-MM-DD; se recorta la cadena para ajustarlo
-        setBirthDate((actor.birthDate ?? "").slice(0, 10));
-        setBiography(actor.biography ?? "");
+      .then((data) => {
+        // Rellena el estado del formulario con la información obtenida del servidor
+        setActor({
+          name: data.name ?? "",
+          photo: data.photo ?? "",
+          nationality: data.nationality ?? "",
+          // El input de fecha necesita el formato YYYY-MM-DD; se recorta la cadena para ajustarlo
+          birthDate: (data.birthDate ?? "").slice(0, 10),
+          biography: data.biography ?? "",
+        });
       })
       .catch(() => setError("No se pudo cargar el actor."));
   }, [actorId]); // Se ejecuta cada vez que el ID del actor cambie
-
-  // Configuración de los campos, cada uno con su valor y su setter
-  const campos = [
-    { id: "name", label: "Nombre", type: "text", value: name, setValue: setName },
-    { id: "photo", label: "Foto (URL)", type: "url", value: photo, setValue: setPhoto },
-    { id: "nationality", label: "Nacionalidad", type: "text", value: nationality, setValue: setNationality },
-    { id: "birthDate", label: "Fecha de nacimiento", type: "date", value: birthDate, setValue: setBirthDate },
-    { id: "biography", label: "Biografía", type: "textarea", value: biography, setValue: setBiography },
-  ];
 
   // PARTE 4: Función que conecta formulario con la API para reflejar los cambios en lista de actores
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
@@ -68,7 +137,7 @@ function FormularioActor({ actorId }: Props) {
         // Especifica que el cuerpo de la petición se enviará en formato JSON
         headers: { "Content-Type": "application/json" },
         // Convierte los datos del formulario a una cadena JSON para enviarlos en el cuerpo
-        body: JSON.stringify({ name, photo, nationality, birthDate, biography }),
+        body: JSON.stringify(actor),
       });
 
       // Valida si la respuesta del servidor fue exitosa; de lo contrario, lanza un error con el código recibido
@@ -82,17 +151,13 @@ function FormularioActor({ actorId }: Props) {
     }
   };
 
-  // Clases compartidas por todos los inputs del formulario
-  const inputClass =
-    "w-full rounded-md border border-gray-300 bg-white px-3 py-2 focus:border-blue-400 focus:ring-4 focus:ring-blue-200 focus:outline-none";
-
   return (
     <div className="overflow-hidden rounded-lg bg-white shadow-sm">
       {/* Vista previa de la foto (se renderiza de manera condicional únicamente cuando hay una URL cargada) */}
-      {photo && (
+      {actor.photo && (
         <div className="border-b border-gray-200 bg-gray-50 p-4 text-center">
           <img
-            src={photo}
+            src={actor.photo}
             alt="Vista previa"
             className="mx-auto h-40 w-40 rounded-xl object-cover shadow-sm"
           />
@@ -109,37 +174,8 @@ function FormularioActor({ actorId }: Props) {
             </div>
           )}
 
-          {/* Cuadrícula que mapea dinámicamente los campos del formulario */}
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-            {campos.map(({ id, label, type, value, setValue }) => (
-              <div className={id === "nationality" || id === "birthDate" ? "" : "md:col-span-2"} key={id}>
-                <label htmlFor={id} className="mb-2 block text-sm font-semibold text-gray-500 uppercase">
-                  {label}
-                </label>
-                {type === "textarea" ? (
-                  <textarea
-                    id={id}
-                    rows={4}
-                    value={value}
-                    onChange={(e: ChangeEvent<HTMLTextAreaElement>) => setValue(e.target.value)}
-                    placeholder="Cuéntanos sobre el actor..."
-                    className={inputClass}
-                    required
-                  />
-                ) : (
-                  <input
-                    id={id}
-                    type={type}
-                    value={value}
-                    onChange={(e: ChangeEvent<HTMLInputElement>) => setValue(e.target.value)}
-                    placeholder={type === "url" ? "https://..." : ""}
-                    className={inputClass}
-                    required
-                  />
-                )}
-              </div>
-            ))}
-          </div>
+          {/* Campos del actor renderizados por el subcomponente reutilizable */}
+          <CamposActor actor={actor} setActor={setActor} />
 
           {/* Barra inferior de botones de acción: cancelar o enviar el formulario */}
           <div className="mt-6 flex justify-end gap-2 border-t border-gray-200 pt-4">

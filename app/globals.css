@@ -1,26 +1,18 @@
-@import "tailwindcss";
-
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
 body {
-  background: #f8f9fa;
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  /* Fondo con un sutil degradado moderno en lugar de un color plano */
+  background: linear-gradient(135deg, #f8f9fa 0%, #a0c8f0 100%);
+  min-height: 100vh;
+}
+
+.card-hover {
+  /* Transición más fluida usando curvas cúbicas para un efecto más natural y "nativo" */
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform, box-shadow;
+}
+
+.card-hover:hover {
+  /* Eleva un poco más la tarjeta y añade un mini zoom imperceptible para darle vida */
+  transform: translateY(-6px) scale(1.01);
+  /* Sombra multicapa avanzada: una sombra difusa de profundidad + una sombra cercana de contacto */
+  box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.15), 0 0.25rem 0.75rem rgba(0, 0, 0, 0.08) !important;
 }

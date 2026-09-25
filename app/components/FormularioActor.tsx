@@ -5,6 +5,10 @@ import { useRouter } from "next/navigation";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import Alert from "react-bootstrap/Alert";
+import Link from "next/link";
+import Card from "react-bootstrap/Card";
+import Row from "react-bootstrap/Row";
+import Col from "react-bootstrap/Col";
 
 const API_URL = "http://localhost:3000/api/v1/actors";
 
@@ -84,36 +88,70 @@ function FormularioActor({ actorId }: Props) {
     }
   };
 
-  return (
-    <Form onSubmit={handleSubmit}>
-      {error && <Alert variant="danger">{error}</Alert>}
+    return (
+    <Card className="border-0 shadow-sm">
+      {/* Vista previa de la foto (se renderiza de manera condicional únicamente cuando hay una URL cargada) */}
+      {photo && (
+        <div className="bg-light text-center p-3 border-bottom">
+          <img
+            src={photo}
+            alt="Vista previa"
+            className="rounded-3 shadow-sm"
+            style={{ height: "160px", width: "160px", objectFit: "cover" }}
+          />
+        </div>
+      )}
 
-      {campos.map(({ id, label, type, value, setValue }) => (
-        <Form.Group className="mb-3" controlId={id} key={id}>
-          <Form.Label>{label}</Form.Label>
-          {type === "textarea" ? (
-            <Form.Control
-              as="textarea"
-              rows={4}
-              value={value}
-              onChange={(e: ChangeEvent<HTMLTextAreaElement>) => setValue(e.target.value)}
-              required
-            />
-          ) : (
-            <Form.Control
-              type={type}
-              value={value}
-              onChange={(e: ChangeEvent<HTMLInputElement>) => setValue(e.target.value)}
-              required
-            />
-          )}
-        </Form.Group>
-      ))}
+      <Card.Body className="p-4">
+        {/* Formulario principal vinculado a la función handleSubmit */}
+        <Form onSubmit={handleSubmit}>
+          {/* Muestra una alerta de error en caso de que ocurra un problema al guardar o cargar */}
+          {error && <Alert variant="danger">{error}</Alert>}
 
-      <Button variant="primary" type="submit">
-        {esEdicion ? "Guardar cambios" : "Crear actor"}
-      </Button>
-    </Form>
+          {/* Cuadrícula que mapea dinámicamente los campos del formulario */}
+          <Row className="g-3">
+            {campos.map(({ id, label, type, value, setValue }) => (
+              <Col md={id === "nationality" || id === "birthDate" ? 6 : 12} key={id}>
+                <Form.Group controlId={id}>
+                  <Form.Label className="fw-semibold small text-uppercase text-muted">
+                    {label}
+                  </Form.Label>
+                  {type === "textarea" ? (
+                    <Form.Control
+                      as="textarea"
+                      rows={4}
+                      value={value}
+                      onChange={(e: ChangeEvent<HTMLTextAreaElement>) => setValue(e.target.value)}
+                      placeholder="Cuéntanos sobre el actor..."
+                      required
+                    />
+                  ) : (
+                    <Form.Control
+                      type={type}
+                      value={value}
+                      onChange={(e: ChangeEvent<HTMLInputElement>) => setValue(e.target.value)}
+                      placeholder={type === "url" ? "https://..." : ""}
+                      required
+                    />
+                  )}
+                </Form.Group>
+              </Col>
+            ))}
+          </Row>
+
+          {/* Barra inferior de botones de acción: cancelar o enviar el formulario */}
+          <div className="d-flex justify-content-end gap-2 mt-4 pt-3 border-top">
+            <Link href="/actores" className="btn btn-outline-secondary">
+              Cancelar
+            </Link>
+            <Button variant="primary" type="submit" className="px-4">
+              {/* El texto del botón cambia dinámicamente según si estamos editando o creando un nuevo registro */}
+              {esEdicion ? "Guardar cambios" : "Crear actor"}
+            </Button>
+          </div>
+        </Form>
+      </Card.Body>
+    </Card>
   );
 }
 
